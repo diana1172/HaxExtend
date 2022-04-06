@@ -181,10 +181,12 @@ def submit():
         if i > 4:
             break
         i = i + 1
-        go_to(urlInfo)
+        driver = get_driver()
+        driver.execute_script('''window.open('https://hax.co.id/vps-info',"_blank")''')
+        driver.close()
+        driver.switch_to.window(driver.window_handles[0])
         print('- wait', i)
-
-    print('- title:', Window().title)
+        print('- title:', Window().title)
 
     try:
         wait_until(Text('Please correct your captcha!.').exists)
