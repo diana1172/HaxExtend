@@ -1,32 +1,32 @@
 name: 'HaxExtend'
 
 on:
-  push:
+  #push:
+  schedule:
+    # run every 3 days on UTC 0/1/2am (8/9/10am CN time)
+     - cron: '0 0,1,2 */3 * *'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
         - name: 'Checkout codes'
           uses: actions/checkout@v2
-        - name: 'Set up Python'
-          uses: actions/setup-python@v2
-          with:
-            python-version: '3.7'
+#         - name: 'Set up Python'
+#           uses: actions/setup-python@v2
+#           with:
+#             python-version: '3.9.10'
         - name: 'Install requirements'
           run: |
-            which python
-            pip install -r ./requirements.txt
-            pip install --user six
-        - name: Install ChromeDriver
-          run: |
-            sudo cp -p ./chromedriver /opt/hostedtoolcache/Python/3.7.12/x64/bin/
-            chmod -R 777 /opt/hostedtoolcache/Python/3.7.12/x64/bin/chromedriver
+            pip3 install -r ./requirements.txt
+
         - name: 'Working'
           env:
             USERNAME: ${{ secrets.USERNAME }}
             PASSWORD: ${{ secrets.PASSWORD }}
             BARKKEY: ${{ secrets.BARKKEY }}
           run: |
-            python ./main.py
+            python3 ./main.py
         
