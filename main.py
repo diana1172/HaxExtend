@@ -9,11 +9,6 @@ import urllib
 import requests
 from helium import *
 from selenium.webdriver.common.by import By
-#from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
-# get直接返回，不再等待界面加载完成
-#desired_capabilities = DesiredCapabilities.CHROME
-#desired_capabilities["pageLoadStrategy"] = "none"
 
 try:
     USER_ID = os.environ['USER_ID']
@@ -45,7 +40,8 @@ except:
     # 本地调试用
     TG_USER_ID = ''
 
-audioFile = "\\audio.mp3"
+audioFile = '/audio.mp3'
+imgFile = '/capture.png'
 urlLogin = 'https://hax.co.id/login'
 urlRenew = 'https://hax.co.id/vps-renew/'
 urlInfo = 'https://hax.co.id/vps-info'
@@ -176,6 +172,7 @@ def submit():
 
     time.sleep(6)
     print('- title:', Window().title)
+
     i = 0
     while Window().title == 'Just a moment...':
         if i > 4:
@@ -186,6 +183,7 @@ def submit():
         driver.close()
         driver.switch_to.window(driver.window_handles[0])
         print('- wait', i)
+        time.sleep(2)
         print('- title:', Window().title)
 
     try:
@@ -334,11 +332,8 @@ def funcCAPTCHA():
 block = False
 print('- Hax loading...')
 
-try:
-    start_chrome(url=urlLogin)
-except:
-    print('*** chrome may crash,restart driver ***')
-    start_chrome(url=urlLogin)
+start_chrome(url=urlLogin)
+
 print('- title:', Window().title)
 # # 向下滚动
 # scroll_down(num_pixels=550)
