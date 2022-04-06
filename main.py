@@ -1,210 +1,336 @@
-"""
-    BYPASS reCaptcha By YouTube Channel: NIKO TECH
-    Captcha + Others By github@Mybdye 2022.03.24
-"""
+# -*- coding: utf-8 -*-
+# https://github.com/mybdye 🌟
+
 import os
-import sys
+import ssl
 import time
-import random
 import urllib
+
 import requests
-
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+from helium import *
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 
-audioToTextDelay = 10
-delayTime = 2
-audioFile = "\\payload.mp3"
-urlLogin = 'https://hax.co.id/login'
-SpeechToTextURL = 'https://speech-to-text-demo.ng.bluemix.net/'
-
-# secret
-USERNAME = os.environ['USERNAME']
-PASSWORD = os.environ['PASSWORD']
 try:
-    BARKKEY = os.environ['BARKKEY']
-    barkKey = 1
+    USER_ID = os.environ['USER_ID']
 except:
-    print('No BarkKey')
-    barkKey = 0
+    # 本地调试用
+    USER_ID = ''
 
-def delay():
-    time.sleep(random.randint(2, 3))
+try:
+    PASS_WD = os.environ['PASS_WD']
+except:
+    # 本地调试用
+    PASS_WD = ''
 
-def audioToText(audioFile):
-    driver.execute_script('''window.open("","_blank")''')
-    driver.switch_to.window(driver.window_handles[1])
-    driver.get(SpeechToTextURL)
+try:
+    BARK_KEY = os.environ['BARK_KEY']
+except:
+    # 本地调试用
+    BARK_KEY = ''
 
-    delay()
-    audioInput = driver.find_element(By.XPATH, '//*[@id="root"]/div/input')
-    audioInput.send_keys(audioFile)
+try:
+    TG_BOT_TOKEN = os.environ['TG_BOT_TOKEN']
+except:
+    # 本地调试用
+    TG_BOT_TOKEN = ''
 
-    time.sleep(audioToTextDelay)
+try:
+    TG_USER_ID = os.environ['TG_USER_ID']
+except:
+    # 本地调试用
+    TG_USER_ID = ''
 
-    text = driver.find_element(By.XPATH, '//*[@id="root"]/div/div[7]/div/div/div/span')
-    while text is None:
-        text = driver.find_element(By.XPATH, '//*[@id="root"]/div/div[7]/div/div/div/span')
+audioFile = "\\audio.mp3"
+urlLogin = 'https://hax.co.id/login'
+urlRenew = 'https://hax.co.id/vps-renew/'
+urlInfo = 'https://hax.co.id/vps-info'
 
-    result = text.text
 
+def switchToWindowSpeechToText():
+    print('- switch to window Speech to Text')
+    if Window('Speech to Text').exists():
+        switch_to('Speech to Text')
+    else:
+        # Selenium open a new window
+        driver = get_driver()
+        driver.execute_script('''window.open('https://speech-to-text-demo.ng.bluemix.net/',"_blank")''')
+        switch_to('Speech to Text')
+
+
+def speechToText():
+    # switchToWindowSpeechToText()
+    driver = get_driver()
+    driver.execute_script('''window.open('https://speech-to-text-demo.ng.bluemix.net/',"_blank")''')
+    switch_to('Speech to Text')
+    text = ''
+    i = 0
+    while text == '':
+        i = i + 1
+        if i > 3:
+            print('*** speechToText issue! ***')
+            break
+        attach_file(os.getcwd() + audioFile, 'Upload Audio File')
+        print('- waiting for transcribe')
+        time.sleep(6)
+        textlist = find_all(S('.tab-panels--tab-content'))
+        text = [key.web_element.text for key in textlist][0]
+        print('- get text:', text)
     driver.close()
-    driver.switch_to.window(driver.window_handles[0])
+    return text
 
-    return result
 
 def reCAPTCHA():
-    g_recaptcha = driver.find_elements(By.CLASS_NAME, 'g-recaptcha')[0]
-    outerIframe = g_recaptcha.find_element(By.TAG_NAME, 'iframe')
-    outerIframe.click()
+    global block
+    print('- click checkbox')
+    click(S('.recaptcha-checkbox-borderAnimation'))
+    time.sleep(3)
+    while S('#recaptcha-audio-button').exists():
+        print('- audio button found')
+        click(S('#recaptcha-audio-button'))
+        time.sleep(3)
+        print('- audio file link searching...')
+        if Text('Alternatively, download audio as MP3').exists() or Text('或者以 MP3 格式下载音频').exists():
+            block = False
+            try:
+                src = Link('Alternatively, download audio as MP3').href
+            except:
+                src = Link('或者以 MP3 格式下载音频').href
+            print('- get src:', src)
+            # 关闭证书验证
+            ssl._create_default_https_context = ssl._create_unverified_context
+            # 下载音频文件
+            urllib.request.urlretrieve(src, os.getcwd() + audioFile)
+            text = speechToText()
+            print('- waiting for switch to hax window')
 
-    iframes = driver.find_elements(By.TAG_NAME, 'iframe')
-    audioBtnFound = False
-    audioBtnIndex = -1
+            # 切回第一个 tab
+            driver = get_driver()
+            driver.switch_to.window(driver.window_handles[0])
+            time.sleep(3)
+            print('- fill audio response')
+            write(text, into=S('#audio-response'))
+            time.sleep(3)
+            print('- click recaptcha verify button')
+            click(S('#recaptcha-verify-button'))
+            time.sleep(3)
 
-    for index in range(len(iframes)):
-        driver.switch_to.default_content()
-        iframe = driver.find_elements(By.TAG_NAME, 'iframe')[index]
-        driver.switch_to.frame(iframe)
-        driver.implicitly_wait(delayTime)
-        try:
-            audioBtn = driver.find_element(By.ID, "recaptcha-audio-button")
-            audioBtn.click()
-            audioBtnFound = True
-            audioBtnIndex = index
+        elif Text('Try again later').exists() or Text('稍后重试').exists():
+            textblock = S('.rc-doscaptcha-body-text').web_element.text
+            print(textblock)
+            body = ' *** 💣 Possibly blocked by google! ***\n' + textblock
+            push(body)
+            block = True
             break
-        except Exception as e:
-            pass
+        else:
+            print('*** audio download element not found,return to func renew ***')
+            renewVPS()
+    return block
 
-    if audioBtnFound:
-        try:
-            while True:
-                # get the mp3 audio file
-                src = driver.find_element(By.ID, "audio-source").get_attribute("src")
-                print("[INFO] Audio src: %s" % src)
 
-                # download the mp3 audio file from the source
-                urllib.request.urlretrieve(src, os.getcwd() + audioFile)
-
-                # Speech To Text Conversion
-                key = audioToText(os.getcwd() + audioFile)
-                print("[INFO] Recaptcha Key: %s" % key)
-
-                driver.switch_to.default_content()
-                iframe = driver.find_elements(By.TAG_NAME, 'iframe')[audioBtnIndex]
-                driver.switch_to.frame(iframe)
-
-                # key in results and submit
-                inputField = driver.find_element(By.ID, "audio-response")
-                inputField.send_keys(key)
-                delay()
-                inputField.send_keys(Keys.ENTER)
-                delay()
-                delay()
-
-                err = driver.find_elements(By.CLASS_NAME, 'rc-audiochallenge-error-message')[0]
-                if err.text == "" or err.value_of_css_property('display') == 'none':
-                    print("[INFO] Success!")
-                    break
-
-        except Exception as e:
-            print(e)
-            barkPush('[INFO] Possibly blocked by google. Change IP,Use Proxy method for requests')
-            sys.exit("[INFO] Possibly blocked by google. Change IP,Use Proxy method for requests")
+def login():
+    print('- login')
+    time.sleep(5)
+    # if S('@username').exists() is False:
+    #     go_to(urlLogin)
+    #     login()
+    wait_until(Text('Login to Hax.co.id').exists)
+    # else:
+    print('- fill user id')
+    if USER_ID == '':
+        print('*** USER_ID is empty ***')
+        kill_browser()
     else:
-        # sys.exit("[INFO] Audio Play Button not found! In Very rare cases!")
-        print('reCAPTCHA not found!')
-    print('reCAPTCHA done')
+        write(USER_ID, into=S('@username'))
+    print('- fill password')
+    if PASS_WD == '':
+        print('*** PASS_WD is empty ***')
+        kill_browser()
+    else:
+        write(PASS_WD, into=S('@password'))
 
-def CAPTCHA():
-    # 获取 captcha 图片链接
-    number1 = int(driver.find_element(By.XPATH, '//*[@id="form-submit"]/div[2]/div[1]/img[1]').get_attribute('src').split('-')[1][0])
-    caculateMethod = driver.find_element(By.XPATH, '//*[@id="form-submit"]/div[2]/div[1]').text[0]
-    number2 = int(driver.find_element(By.XPATH, '//*[@id="form-submit"]/div[2]/div[1]/img[2]').get_attribute('src').split('-')[1][0])
-    print('Method', caculateMethod)
-    if caculateMethod == '+':
+    if Text('reCAPTCHA').exists():
+        # if S('#recaptcha-token').exists():
+        print('- reCAPTCHA found!')
+        block = reCAPTCHA()
+        if block:
+            print('*** Possibly blocked by google! ***')
+        else:
+            submit()
+    else:
+        print('- reCAPTCHA not found!')
+        submit()
+
+
+def submit():
+    print('- submit')
+    # 向下滚动，有时候提示找不到按钮（被其他控件cover）
+    scroll_down(num_pixels=200)
+    click('Submit')
+    print('- submit clicked')
+
+    time.sleep(4)
+    print('- title:', Window().title)
+    i = 0
+    while Window().title == 'Just a moment...':
+        time.sleep(2)
+        if i>20:
+            break
+        i = i+2
+        print('- wait', i)
+    print('- title:', Window().title)
+
+    try:
+        wait_until(Text('Please correct your captcha!.').exists)
+        print('*** Network issue maybe, reCAPTCHA load fail! ***')
+        go_to(urlLogin)
+        time.sleep(2)
+        login()
+    except:
+        pass
+    try:
+        wait_until(Text('Invalid').exists)
+        print('*** Invalid Username / Password ! ***')
+    except:
+        pass
+    try:
+        wait_until(Text('VPS Information').exists)
+        print('- VPS Information found!')
+        renewVPS()
+    except:
+        print('- title:', Window().title)
+        body = ' *** 💣 some error in func submit!, stop running ***'
+        # login()
+        push(body)
+        print(body)
+        kill_browser()
+
+
+def renewVPS():
+    global block
+    print('- renew VPS')
+    go_to(urlRenew)
+    time.sleep(1)
+    # 向下滚动
+    scroll_down(num_pixels=900)
+    time.sleep(1)
+    if S('#web_address').exists():
+        print('- fill web address')
+        write('hax.co.id', into=S('#web_address'))
+        # 过 CAPTCHA
+        captcha = funcCAPTCHA()
+        print('- fill captcha result')
+        write(captcha, into=S('@captcha'))
+        print('- check agreement')
+        click(S('@agreement'))
+        if Text('reCAPTCHA').exists():
+            print('- reCAPTCHA found!')
+            block = reCAPTCHA()
+            if block:
+                textList = find_all(S('.rc-doscaptcha-body-text'))
+                result = [key.web_element.text for key in textList][0]
+                print('*** Possibly blocked by google! ***')
+                print(result)
+                body = '*** Possibly blocked by google! ***'
+                # renewVPS()
+                push(body)
+                kill_browser()
+            else:
+                # 向下滚动
+                scroll_down(num_pixels=200)
+                click('Renew VPS')
+        else:
+            print('- reCAPTCHA not found!')
+            click('Renew VPS')
+        body = extendResult()
+        if 'renewed' in body:
+            body = '🎉 ' + body
+        print('- extend result:', body)
+        push(body)
+        time.sleep(2)
+        kill_browser()
+    else:
+        renewVPS()
+
+
+def extendResult():
+    print('- waiting for extend result response')
+    time.sleep(10)
+    if S('#response').exists():
+        textList = find_all(S('#response'))
+        result = [key.web_element.text for key in textList][0]
+    else:
+        renewVPS()
+    return result
+
+
+def push(body):
+    print('- waiting for push result')
+    # bark push
+    if BARK_KEY == '':
+        print('*** No BARK_KEY ***')
+    else:
+        barkurl = 'https://api.day.app/' + BARK_KEY
+        title = 'HaxExtend'
+        rq_bark = requests.get(url=f'{barkurl}/{title}/{body}?isArchive=1')
+        if rq_bark.status_code == 200:
+            print('- bark push Done!')
+        else:
+            print('*** bark push fail! ***', rq_bark.content.decode('utf-8'))
+
+    # tg push
+    if TG_BOT_TOKEN == '' or TG_USER_ID == '':
+        print('*** No TG_BOT_TOKEN or TG_USER_ID ***')
+    else:
+        body = 'HaxExtend\n\n' + body
+        server = 'https://api.telegram.org'
+        tgurl = server + '/bot' + TG_BOT_TOKEN + '/sendMessage'
+        rq_tg = requests.post(tgurl, data={'chat_id': TG_USER_ID, 'text': body}, headers={
+            'Content-Type': 'application/x-www-form-urlencoded'})
+        if rq_tg.status_code == 200:
+            print('- tg push Done!')
+        else:
+            print('*** tg push fail! ***', rq_tg.content.decode('utf-8'))
+
+    print('- finish!')
+
+
+def funcCAPTCHA():
+    print('- do CAPTCHA')
+    divList = find_all(S('.col-sm-3'))
+    # 取计算方法
+    method = [key.web_element.text for key in divList][0][0]
+    # Helium 下没有好的方法拿到两个小图片的 src，切换到 selenium
+    driver = get_driver()
+    number1 = int(
+        driver.find_element(By.XPATH, '//*[@id="form-submit"]/div[2]/div[1]/img[1]').get_attribute('src').split('-')[1][
+            0])
+    number2 = int(
+        driver.find_element(By.XPATH, '//*[@id="form-submit"]/div[2]/div[1]/img[2]').get_attribute('src').split('-')[1][
+            0])
+
+    if method == '+':
         captcha_result = number1 + number2
-    elif caculateMethod == '-':
+    elif method == '-':
+        # 应该没有 但还是写了
         captcha_result = number1 - number2
-    elif caculateMethod == 'X':
+    elif method == 'X':
         captcha_result = number1 * number2
-    elif caculateMethod == '/':
+    elif method == '/':
+        # 应该没有 但还是写了
         captcha_result = number1 / number2
+
+    print('- captcha result:', number1, method, number2, '=', captcha_result)
     return captcha_result
 
-def barkPush(body):
-    if barkKey == 1:
-        # bark push
-        barkUrl = 'https://api.day.app/' + BARKKEY
-        title = 'HaxExtend'
-        requests.get(url=f'{barkUrl}/{title}/{body}?isArchive=1')
-        print('bark push Done! Body:', body)
-    elif barkKey == 0:
-        print('No barkKey, Body is:', body)
+block = False
+print('- Hax loading...')
 
 try:
-    # create chrome driver
-    Options = webdriver.ChromeOptions()
-    Options.add_argument('--headless')
-    Options.add_argument('--no-sandbox')
-    Options.add_argument('--disable-gpu')
-    Options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome(options=Options)
-    delay()
-    # go to website which have recaptcha protection
-    driver.get(urlLogin)
-except Exception as e:
-    sys.exit(
-        "[-] Please update the chromedriver in the webdriver folder according to your chrome version:https://chromedriver.chromium.org/downloads")
-
-# main
-time.sleep(10)
-print('fill username')
-driver.find_element(By.XPATH, '//*[@id="text"]').send_keys(USERNAME)
-print('fill password')
-driver.find_element(By.XPATH, '//*[@id="password"]').send_keys(PASSWORD)
-delay()
-# reCAPTCHA
-print('do reCAPTCHA')
-reCAPTCHA()
-time.sleep(10)
-# login
-driver.switch_to.default_content()
-print('click login')
-driver.find_element(By.NAME, 'login').click()
-time.sleep(10)
-# Extend VPS link
-print('click Extend VPS')
-WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.LINK_TEXT, 'Extend VPS Expiration'))).click()
-time.sleep(10)
-# input web address
-print('fill web address')
-driver.find_element(By.XPATH, '//*[@id="web_address"]').send_keys('hax.co.id')
-# captcha
-print('do CAPTCHA')
-driver.find_element(By.XPATH,'//*[@id="captcha"]').send_keys(CAPTCHA())
-# agreement check
-print('click agreement')
-driver.find_element(By.NAME, 'agreement').click()
-# reCAPTCHA again
-print('do reCAPTCHA')
-reCAPTCHA()
-time.sleep(10)
-driver.switch_to.default_content()
-# submit_button (Renew VPS)
-print('click Renew VPS')
-driver.find_element(By.NAME, 'submit_button').click()
-time.sleep(15)
-print('copy text')
-body = WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="response"]/div'))).text
-# print('textBody:', body)
-delay()
-print('bark push')
-barkPush(body)
-delay()
-driver.quit()
+    start_chrome(url=urlLogin)
+except:
+    print('*** chrome may crash,restart driver ***')
+    start_chrome(url=urlLogin)
+print('- title:', Window().title)
+# # 向下滚动
+# scroll_down(num_pixels=550)
+login()
