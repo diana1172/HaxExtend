@@ -101,20 +101,22 @@ def reCAPTCHA():
             ssl._create_default_https_context = ssl._create_unverified_context
             # 下载音频文件
             urllib.request.urlretrieve(src, os.getcwd() + audioFile)
-            time.sleep(3)
+            time.sleep(4)
             text = speechToText()
             print('- waiting for switch to hax window')
 
             # 切回第一个 tab
             driver = get_driver()
             driver.switch_to.window(driver.window_handles[0])
-            time.sleep(3)
+            #time.sleep(3)
+            wait_until(S('#audio-response').exists)
             print('- fill audio response')
             write(text, into=S('#audio-response'))
-            time.sleep(3)
+            #time.sleep(3)
+            wait_until(S('#recaptcha-verify-button').exists)
             print('- click recaptcha verify button')
             click(S('#recaptcha-verify-button'))
-            time.sleep(3)
+            time.sleep(1)
 
         elif Text('Try again later').exists() or Text('稍后重试').exists():
             textblock = S('.rc-doscaptcha-body-text').web_element.text
