@@ -178,15 +178,12 @@ def submit():
     print('- title:', Window().title)
     i = 0
     while Window().title == 'Just a moment...':
-        time.sleep(2)
         if i > 4:
             break
-        kill_browser()
-        time.sleep(2)
-        start_chrome(urlLogin)
-        login()
         i = i + 1
+        go_to(urlInfo)
         print('- wait', i)
+
     print('- title:', Window().title)
 
     try:
