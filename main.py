@@ -164,7 +164,7 @@ def login():
 def submit():
     print('- submit')
     # 向下滚动，有时候提示找不到按钮（被其他控件cover）
-    scroll_down(num_pixels=200)
+    scroll_down(num_pixels=500)
     click('Submit')
     print('- submit clicked')
 
