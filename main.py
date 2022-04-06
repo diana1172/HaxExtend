@@ -105,6 +105,7 @@ def reCAPTCHA():
             ssl._create_default_https_context = ssl._create_unverified_context
             # 下载音频文件
             urllib.request.urlretrieve(src, os.getcwd() + audioFile)
+            time.sleep(3)
             text = speechToText()
             print('- waiting for switch to hax window')
 
