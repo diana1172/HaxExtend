@@ -9,6 +9,11 @@ import urllib
 import requests
 from helium import *
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+# get直接返回，不再等待界面加载完成
+desired_capabilities = DesiredCapabilities.CHROME
+desired_capabilities["pageLoadStrategy"] = "none"
 
 try:
     USER_ID = os.environ['USER_ID']
