@@ -3,7 +3,7 @@
 - TBD
 
 #### 状态
-- 已知 BUG，submit 提交后页面刷新到页面VPS Information 的过程中大概率出现问题，导致下一步renew 无法进行。HaxExtend那个仓库也一样是一个原因。
+- 已知 BUG，submit 提交后页面刷新到 VPS Information 的过程中大概率出现问题，导致下一步renew 无法进行。
 
 #### 项目进度
 - 0330 添加了 tg push，`func submit` 也还有些 ~~小~~ 问题
@@ -12,6 +12,7 @@
 
 #### 🍳 烹饪方法：1.1 
 - Settings > Secrets > Actions 添加以下变量
+
 |YOU SECRET NAME|YOU SECRET VALUE|
 |-----|-----|
 |`USER_ID`|你的 id|
@@ -49,7 +50,7 @@ or
 <img src=./result.jpg width=50% />
 
 #### How This Work
-- https://github.com/mybdye/HaxExtend_helium/blob/master/howthiswork.md
+- https://github.com/mybdye/HaxExtend/blob/master/howthiswork.md
 
 #### 资料参考
 - https://www.python.org/
