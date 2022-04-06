@@ -175,34 +175,34 @@ def submit():
     time.sleep(6)
     print('- title:', Window().title)
 
-    # i = 0
-    # while Window().title == 'Just a moment...':
-    #     if i > 4:
-    #         break
-    #     i = i + 1
-    #     driver = get_driver()
-    #     driver.get_screenshot_as_file(os.getcwd())
-    #     driver.execute_script('''window.open('https://hax.co.id/vps-info',"_blank")''')
-    #     driver.close()
-    #     driver.switch_to.window(driver.window_handles[0])
-    #     print('- wait', i)
-    #     time.sleep(2)
-    #     print('- title:', Window().title)
-
-    if Window().title == 'Just a moment...':
-        # debug for submit issue
+    i = 0
+    while Window().title == 'Just a moment...':
+        if i > 4:
+            break
+        i = i + 1
         driver = get_driver()
-        driver.get_screenshot_as_file(os.getcwd()+imgFile)
-        driver.execute_script('''window.open('http://mjjzp.cf/',"_blank")''')
-        switch_to('白嫖图床')
-        driver.find_element(By.ID, 'image').send_keys('os.getcwd()+imgFile')
-        time.sleep(4)
-        click('上传')
-        wait_until(Text('完成').exists)
-        textList = find_all(S('#code-url'))
-        result = [key.web_element.text for key in textList][0]
-        print('*** capture src:', result)
-        kill_browser()
+        driver.get_screenshot_as_file(os.getcwd())
+        driver.execute_script('''window.open('https://hax.co.id/vps-info',"_blank")''')
+        driver.close()
+        driver.switch_to.window(driver.window_handles[0])
+        print('- wait', i)
+        time.sleep(2)
+        print('- title:', Window().title)
+
+#     if Window().title == 'Just a moment...':
+#         # debug for submit issue
+#         driver = get_driver()
+#         driver.get_screenshot_as_file(os.getcwd()+imgFile)
+#         driver.execute_script('''window.open('http://mjjzp.cf/',"_blank")''')
+#         switch_to('白嫖图床')
+#         driver.find_element(By.ID, 'image').send_keys('os.getcwd()+imgFile')
+#         time.sleep(4)
+#         click('上传')
+#         wait_until(Text('完成').exists)
+#         textList = find_all(S('#code-url'))
+#         result = [key.web_element.text for key in textList][0]
+#         print('*** capture src:', result)
+#         kill_browser()
 
 
     try:
