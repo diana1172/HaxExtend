@@ -173,14 +173,18 @@ def submit():
     click('Submit')
     print('- submit clicked')
 
-    time.sleep(4)
+    time.sleep(6)
     print('- title:', Window().title)
     i = 0
     while Window().title == 'Just a moment...':
         time.sleep(2)
-        if i>20:
+        if i > 4:
             break
-        i = i+2
+        kill_browser()
+        time.sleep(2)
+        start_chrome(urlLogin)
+        login()
+        i = i + 1
         print('- wait', i)
     print('- title:', Window().title)
 
