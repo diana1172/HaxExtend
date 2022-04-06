@@ -1,6 +1,6 @@
 # [![HaxExtend](https://github.com/mybdye/HaxExtend/actions/workflows/main.yml/badge.svg)](https://github.com/mybdye/HaxExtend/actions/workflows/main.yml)
 #### 计划
-- TBD
+- submit 里面一直 Just a moment... ，花点时间拿到了截图，果然是 cloudflare 5s 盾，上班摸鱼再看看 :)
 
 #### 状态
 - 已知 BUG，submit 提交后页面刷新到 VPS Information 的过程中大概率出现问题，导致下一步renew 无法进行。
