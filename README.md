@@ -1,4 +1,4 @@
-# HaxExtend
+# [![HaxExtend](https://github.com/mybdye/HaxExtend/actions/workflows/main.yml/badge.svg)](https://github.com/mybdye/HaxExtend/actions/workflows/main.yml)
 #### 计划
 - TBD
 
