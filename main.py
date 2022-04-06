@@ -275,7 +275,8 @@ def renewVPS():
         time.sleep(2)
         kill_browser()
     else:
-        renewVPS()
+        #renewVPS()
+        kill_browser()
 
 
 def extendResult():
