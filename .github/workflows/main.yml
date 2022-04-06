@@ -3,14 +3,15 @@ name: 'HaxExtend'
 on:
   #push:
   schedule:
-    # run every 3 days on UTC 0/1/2am (8/9/10am CN time)
-     - cron: '0 0,1,2 */3 * *'
+    # UTC time (国内 UTC+8)，每小时运行一次，观察结果分布
+     - cron: '30 4 * * *'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: macos-latest
+
     steps:
         - name: 'Checkout codes'
           uses: actions/checkout@v2
@@ -20,13 +21,15 @@ jobs:
 #             python-version: '3.9.10'
         - name: 'Install requirements'
           run: |
-            pip3 install -r ./requirements.txt
-
+            python3 -m pip install -r ./requirements.txt
+#            python3 -m pip install --upgrade pip
         - name: 'Working'
           env:
-            USERNAME: ${{ secrets.USERNAME }}
-            PASSWORD: ${{ secrets.PASSWORD }}
-            BARKKEY: ${{ secrets.BARKKEY }}
+            USER_ID: ${{ secrets.USER_ID }}
+            PASS_WD: ${{ secrets.PASS_WD }}
+            BARK_KEY: ${{ secrets.BARK_KEY }}
+            TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+            TG_USER_ID: ${{ secrets.TG_USER_ID }}
+
           run: |
             python3 ./main.py
-        
