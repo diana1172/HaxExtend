@@ -9,11 +9,11 @@ import urllib
 import requests
 from helium import *
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+#from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 # get直接返回，不再等待界面加载完成
-desired_capabilities = DesiredCapabilities.CHROME
-desired_capabilities["pageLoadStrategy"] = "none"
+#desired_capabilities = DesiredCapabilities.CHROME
+#desired_capabilities["pageLoadStrategy"] = "none"
 
 try:
     USER_ID = os.environ['USER_ID']
@@ -105,6 +105,7 @@ def reCAPTCHA():
             ssl._create_default_https_context = ssl._create_unverified_context
             # 下载音频文件
             urllib.request.urlretrieve(src, os.getcwd() + audioFile)
+            time.sleep(3)
             text = speechToText()
             print('- waiting for switch to hax window')
 
@@ -173,15 +174,16 @@ def submit():
     click('Submit')
     print('- submit clicked')
 
-    time.sleep(4)
+    time.sleep(6)
     print('- title:', Window().title)
     i = 0
     while Window().title == 'Just a moment...':
-        time.sleep(2)
-        if i>20:
+        if i > 4:
             break
-        i = i+2
+        i = i + 1
+        go_to(urlInfo)
         print('- wait', i)
+
     print('- title:', Window().title)
 
     try:
