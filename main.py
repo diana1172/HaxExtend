@@ -192,6 +192,7 @@ try:
     # create chrome driver
     Options = webdriver.ChromeOptions()
     Options.add_argument('--headless')
+    Options.add_argument('--window-size=1920x945')
     Options.add_argument('--no-sandbox')
     Options.add_argument('--disable-gpu')
     Options.add_argument('--disable-dev-shm-usage')
@@ -206,8 +207,8 @@ except Exception as e:
 
 # main
 time.sleep(10)
-# scroll down 200px
-driver.execute_script('window.scrollBy(0, 200)')
+# scroll down
+driver.execute_script('window.scrollBy(0, 500)')
 delay()
 print('- fill username')
 driver.find_element(By.XPATH, '//*[@id="text"]').send_keys(USER_ID)
