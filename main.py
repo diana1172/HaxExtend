@@ -206,6 +206,9 @@ except Exception as e:
 
 # main
 time.sleep(10)
+# scroll down 200px
+driver.execute_script('window.scrollBy(0, 200)')
+delay()
 print('- fill username')
 driver.find_element(By.XPATH, '//*[@id="text"]').send_keys(USERNAME)
 print('- fill password')
