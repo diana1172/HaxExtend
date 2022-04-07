@@ -192,15 +192,24 @@ try:
     # create chrome driver
     Options = webdriver.ChromeOptions()
     Options.add_argument('--headless')
-    Options.add_argument('--window-size=1920x945')
+    #Options.add_argument('--window-size=1920x945')
     Options.add_argument('--no-sandbox')
     Options.add_argument('--disable-gpu')
     Options.add_argument('--disable-dev-shm-usage')
     driver = webdriver.Chrome(options=Options)
-    #driver.set_window_size(1920, 1080)
     delay()
     # go to website which have recaptcha protection
     driver.get(urlLogin)
+    delay()
+    width = driver.execute_script("return document.documentElement.scrollWidth")
+    height = driver.execute_script("return document.documentElement.scrollHeight")
+    print('width,height:', width, height)
+    delay()
+    driver.set_window_size(width, height)
+    delay()
+    #driver.save_screenshot(pic_name)
+    
+
 except Exception as e:
     sys.exit(
         "[-] Please update the chromedriver in the webdriver folder according to your chrome version:https://chromedriver.chromium.org/downloads")
