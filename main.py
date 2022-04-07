@@ -196,7 +196,7 @@ try:
     Options.add_argument('--disable-gpu')
     Options.add_argument('--disable-dev-shm-usage')
     driver = webdriver.Chrome(options=Options)
-    driver.set_window_size(1920, 1080)
+    #driver.set_window_size(1920, 1080)
     delay()
     # go to website which have recaptcha protection
     driver.get(urlLogin)
