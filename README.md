@@ -1,9 +1,10 @@
 # [![HaxExtend](https://github.com/mybdye/HaxExtend/actions/workflows/main.yml/badge.svg)](https://github.com/mybdye/HaxExtend/actions/workflows/main.yml)
-#### 计划
-- submit 里面一直 Just a moment... ，花点时间拿到了截图，果然是 cloudflare 5s 盾，上班摸鱼再看看 :)
+#### 修补计划（dev 分支）
+- submit 处理 cloudflare 5s
+- 其他 处理元素被遮挡
 
 #### 状态
-- 已知 BUG，submit 提交后页面刷新到 VPS Information 的过程中大概率出现问题，导致下一步renew 无法进行。
+- 不可用
 
 #### 项目进度
 - 0330 添加了 tg push，`func submit` 也还有些 ~~小~~ 问题
